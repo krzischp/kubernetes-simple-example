@@ -1,0 +1,105 @@
+# Issues
+When running docker-compose up with docker.app daemon (and not `nu docker start`), first need to do this update (each time you launch the daemon)
+In ~/.docker/config.json change credsStore to credStore
+link of the answer
+
+# Instalando uma distribuição de Kubernetes Localmente
+https://aurimrv.gitbook.io/pratica-devops-com-docker-para-machine-learning/id-5-infraestrutura-como-codigo-e-orquestracao/5-3-kubernetes
+
+### Tutorial Using Minikube
+
+1. Start Minikube:
+
+```bash
+minikube start
+```
+
+2. Enable the basic addons:
+
+Minikube uses the term "addons" instead of "plugins". You can enable the dashboard, DNS, and registry addons as follows:
+```bash
+minikube addons enable dashboard
+minikube addons enable registry
+```
+The addon ingress-dns is already installed.
+
+3. Access the Kubernetes dashboard:
+
+```bash
+minikube dashboard
+```
+
+This sequence should help you get started with Minikube instead of MicroK8s. If you have any specific configurations or additional steps in your original tutorial, please share them, and I can help adapt those as well.
+
+### Troubleshooting Minikube
+minikube logs
+
+Sometimes, simply restarting Minikube can resolve issues:
+minikube stop
+minikube start
+
+Make sure you are using the latest version of Minikube:
+minikube update-check
+
+### Executando uma aplicação Hello World
+Inicialmente vamos criar um namespace para organizar todos os workloads desse exemplo:
+kubectl create ns hello-world
+
+Para indicarmos que todos os próximos comandos serão executados no namespace criado, atualizamos o contexto de trabalho:
+kubectl config set-context --current --namespace=hello-world
+
+Na sequência, iremos criar o nosso primeiro deployment:
+kubectl create deployment hello --image=k8s.gcr.io/echoserver:1.4
+
+Podemos verificar o status do deployment da nossa aplicação via dashboard ou pelo seguinte comando:
+kubectl get deployments
+
+Uma vez que nossa aplicação estiver pronta, temos que expô-la para acesso externo:
+kubectl expose deployment hello --type=NodePort --port 8080
+
+Por fim, basta verificar em qual porta nossa aplicação está disponível e acessá-la pelo navegador:
+kubectl get svc
+
+
+
+http://127.0.0.1:32901/
+http://10.107.3.15:8080
+
+
+http://192.168.49.2:32205
+
+### Troubleshooting Kubectl
+Diagnosticar e Resolver o Problema
+kubectl get pods -n hello-world
+
+Verificar eventos do deployment:
+kubectl describe deployment hello -n hello-world
+
+Logs dos pods:
+kubectl logs <pod-name> -n hello-world
+Ex: kubectl logs hello-759d6b7cb8-kqqkv -n hello-world
+
+Recriar o deployment:
+kubectl delete deployment hello -n hello-world
+kubectl create deployment hello --image=k8s.gcr.io/echoserver:1.4 -n hello-world
+
+
+### Hello image not working anymore, so we're trying with echoserver here
+curl -sL https://raw.githubusercontent.com/Ealenn/Echo-Server/master/docs/examples/echo.kube.yaml > echo.kube.yaml
+
+kubectl apply -f ./echo.kube.yaml
+kubectl config set-context --current --namespace=echoserver
+kubectl expose deployment echoserver --type=NodePort --port 8080
+Error from server (AlreadyExists): services "echoserver" already exists
+
+minikube ip
+
+http://192.168.49.2:80
+
+Isso deve abrir o navegador na URL correta para acessar sua aplicação. Se ainda assim não funcionar, podemos investigar mais detalhadamente:
+minikube service echoserver -n echoserver
+
+TODO:
+Continue from here:
+https://aurimrv.gitbook.io/pratica-devops-com-docker-para-machine-learning/id-5-infraestrutura-como-codigo-e-orquestracao/5-3-kubernetes#id-5.3.7-orquestrando-o-classificador-de-produtos-com-kubernetes
+
